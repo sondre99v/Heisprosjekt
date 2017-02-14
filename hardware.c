@@ -181,11 +181,11 @@ void hw_set_led_state(Led_button_t led, bool state){
         io_clear_bit(LIGHT_FLOOR_IND1);
         io_clear_bit(LIGHT_FLOOR_IND2);
     } else if (led == led_floor_2nd){
-        io_set_bit(LIGHT_FLOOR_IND1);
-        io_clear_bit(LIGHT_FLOOR_IND2);
-    } else if (led == led_floor_3rd){
         io_clear_bit(LIGHT_FLOOR_IND1);
         io_set_bit(LIGHT_FLOOR_IND2);
+    } else if (led == led_floor_3rd){
+        io_set_bit(LIGHT_FLOOR_IND1);
+        io_clear_bit(LIGHT_FLOOR_IND2);
     } else if (led == led_floor_4th){
         io_set_bit(LIGHT_FLOOR_IND1);
         io_set_bit(LIGHT_FLOOR_IND2);
