@@ -3,6 +3,7 @@
 
 
 int main() {
+    return 0;/*
     // Initialize hardware
     if (!elev_init()) {
         printf("Unable to initialize elevator hardware!\n");
@@ -28,5 +29,5 @@ int main() {
         }
     }
 
-    return 0;
+    return 0;*/
 }
