@@ -7,6 +7,7 @@
 //#include "channels.h"
 #include "hardware.h"
 #include "io.h"
+#include "stdbool.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -151,10 +152,10 @@ void elev_set_button_lamp(elev_button_type_t button, int floor, int value) {
 //Our own functions
 
 void hw_init(){
-    if (!io_init());
-
-//Set all lamps off!
-
+    io_init();
+    for (Led_t led = led_floor_4th; led <= led_stop; led++){
+        hw_set_led_state(led, false);
+    }
 }
 
 void hw_set_motor_state(Motor_state_t state){
@@ -175,7 +176,7 @@ void hw_set_motor_state(Motor_state_t state){
     return;
 }
 
-void hw_set_led_state(Led_button_t led, bool state){
+void hw_set_led_state(Led_t led, bool state){
 
     if (led == led_floor_1st){
         io_clear_bit(LIGHT_FLOOR_IND1);

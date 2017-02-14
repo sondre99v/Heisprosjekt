@@ -38,23 +38,23 @@ typedef enum {
 }   Sensor_floor_t;
 
 typedef enum {
+    led_stop        = (0x300+14),
     led_dropoff_1st = (0x300+13),
     led_dropoff_2nd = (0x300+12),
     led_dropoff_3rd = (0x300+11),
     led_dropoff_4th = (0x300+10),
     led_up_1st      = (0x300+9),
-    led_down_2nd    = (0x300+7),
     led_up_2nd      = (0x300+8),
-    led_down_3rd    = (0x300+5),
+    led_down_2nd    = (0x300+7),
     led_up_3rd      = (0x300+6),
+    led_down_3rd    = (0x300+5),
     led_down_4th    = (0x300+4),
-    led_stop        = (0x300+14),
     led_door        = (0x300+3),
-    led_floor_1st,
-    led_floor_2nd,
-    led_floor_3rd,
-    led_floor_4th
-}   Led_button_t;
+    led_floor_1st   = (0x300+2),
+    led_floor_2nd   = (0x300+1),
+    led_floor_3rd   = (0x300+0),
+    led_floor_4th   = (0x299)
+}   Led_t;
 
 typedef enum {
     button_up_1st       = (0x300+17),
@@ -189,7 +189,7 @@ void hw_init();
 
 void hw_set_motor_state(Motor_state_t state);
 
-void hw_set_led_state(Led_button_t led, bool state);
+void hw_set_led_state(Led_t led, bool state);
 
 void hw_set_door_state(Door_state_t state);
 
