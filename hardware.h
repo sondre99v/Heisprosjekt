@@ -1,3 +1,10 @@
+
+typedef enum {,
+	door_closed,
+	door_opened
+} Door_state_t;
+
+
 // Wrapper for libComedi Elevator control.
 // These functions provides an interface to the elevators in the real time lab
 //
