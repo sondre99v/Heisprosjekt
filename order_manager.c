@@ -4,7 +4,7 @@
 // The order queue is implemented as a singly linked list.
 typedef struct Order_list_node_t{
 	Order_t order;
-	Order_list_node_t* next;
+	struct Order_list_node_t* next;
 } Order_list_node_t;
 
 static Order_list_node_t* order_queue = NULL;
@@ -41,7 +41,7 @@ static Order_list_node_t* _create_new_node (Floor_t pickup_floor, Direction_t di
 
 void om_add_new_order (Floor_t pickup_floor, Direction_t direction) {
 	// Create new node with given values
-	Order_list_node_t* new_order_node = _create_new_node(pickup_floor, pickup_direction, floor_unknown, order_queue);
+	Order_list_node_t* new_order_node = _create_new_node(pickup_floor, direction, floor_unknown, order_queue);
 	
 	// Set the new node as the first in the queue
 	order_queue = new_order_node;
@@ -52,7 +52,7 @@ Order_t* om_get_first_order (void) {
 		// Order queue is empty
 		return NULL;
 	} else {
-		return order_queue -> order;
+		return &(order_queue -> order);
 	}
 }
 
@@ -74,7 +74,7 @@ void om_remove_order (Order_t* order) {
 		return;
 	}
 	
-	if (order_queue -> order == order) {
+	if (&(order_queue -> order) == order) {
 		// Order to remove was first in the queue
 		Order_list_node_t* to_delete = order_queue;
 		order_queue = order_queue -> next;
@@ -85,7 +85,7 @@ void om_remove_order (Order_t* order) {
 	// Search through queue to find the order before the one to remove
 	Order_list_node_t* node = order_queue;
 	
-	while (node -> next.order != order) {
+	while (&(node -> next -> order) != order) {
 		node = node -> next;
 		if (node -> next == NULL) {
 			// Order to remove was not found in the queue
@@ -101,7 +101,7 @@ void om_remove_order (Order_t* order) {
 
 void om_clear_all_orders (void) {
 	while (order_queue != NULL) {
-		om_remove_order (order_queue -> order);
+		om_remove_order (&(order_queue -> order));
 	}
 }
 
