@@ -152,10 +152,29 @@ void elev_set_button_lamp(elev_button_type_t button, int floor, int value) {
 //Our own functions
 
 void hw_init(){
+    //Starts the IO
     io_init();
-    for (Led_t led = led_floor_4th; led <= led_stop; led++){
-        hw_set_led_state(led, false);
-    }
+
+    //Sets all LED's to off
+    hw_set_led_state(led_stop,false);
+    hw_set_led_state(led_dropoff_1st,false);
+    hw_set_led_state(led_dropoff_2nd,false);
+    hw_set_led_state(led_dropoff_3rd,false);
+    hw_set_led_state(led_dropoff_4th,false);
+    hw_set_led_state(led_up_1st,false);
+    hw_set_led_state(led_up_2nd,false);
+    hw_set_led_state(led_down_2nd,false);
+    hw_set_led_state(led_up_3rd,false);
+    hw_set_led_state(led_down_3rd,false);
+    hw_set_led_state(led_down_4th,false);
+    hw_set_led_state(led_door,false);
+    hw_set_led_state(led_floor_1st,false);
+    hw_set_led_state(led_floor_2nd,false);
+    hw_set_led_state(led_floor_3rd,false);
+    hw_set_led_state(led_floor_4th,false);
+
+    //Turns motor off
+    hw_set_motor_state(stopped);
 }
 
 void hw_set_motor_state(Motor_state_t state){
