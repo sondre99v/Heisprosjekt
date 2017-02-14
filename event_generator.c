@@ -1,6 +1,9 @@
 #include "event_generator.h"
 
 #include <stdbool.h>
+#include "hardware.h"
+#include "elevator_controller.h"
+#include "timer.h"
 
 struct { Button_t button; bool previous_state; Event_t event_to_raise_on_press; } buttons [] = {
 	{.button = button_up_1st, .previous_state = false	, pressed_up_1st},
