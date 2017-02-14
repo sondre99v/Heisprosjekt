@@ -76,7 +76,7 @@ typedef enum {
     floor_2nd,
     floor_3rd,
     floor_4th
-}   Floor_t;
+}   Floor_sensor_t;
 
 
 /*
@@ -195,7 +195,7 @@ void hw_set_door_state(Door_state_t state);
 
 bool hw_is_button_pressed(Button_t button);
 
-Floor_t hw_get_sensors_state(void);
+Floor_sensor_t hw_get_sensors_state(void);
 
 
 
