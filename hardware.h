@@ -56,11 +56,11 @@ typedef enum {
     button_down_3rd     = (0x200+2),
     button_up_3rd       = (0x200+1),
     button_down_4th     = (0x200+3),
-    button_stop         =(0x300+22),
-    button_floor_1st    =(0x300+21),
-    button_floor_2nd    =(0x300+20),
-    button_floor_3rd    =(0x300+19),
-    button_floor_4th    =(0x300+18)
+    button_stop         = (0x300+22),
+    button_floor_1st    = (0x300+21),
+    button_floor_2nd    = (0x300+20),
+    button_floor_3rd    = (0x300+19),
+    button_floor_4th    = (0x300+18)
 }   Button_t;
 
 typedef enum {
@@ -177,6 +177,8 @@ typedef enum tag_elev_lamp_type {
 
 
 //Our own functions
+
+void hw_init();
 
 void hw_set_motor_state(Motor_state_t state);
 

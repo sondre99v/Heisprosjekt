@@ -150,6 +150,13 @@ void elev_set_button_lamp(elev_button_type_t button, int floor, int value) {
 
 //Our own functions
 
+void hw_init(){
+    if (!io_init());
+
+//Set all lamps off!
+
+}
+
 void hw_set_motor_state(Motor_state_t state){
     int motor_speed = 2800;
 
