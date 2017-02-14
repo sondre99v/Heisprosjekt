@@ -176,17 +176,20 @@ void hw_set_motor_state(Motor_state_t state){
 }
 
 void hw_set_led_state(Led_button_t led, bool state){
-    /* Maybe this is not needed, that depends on the light_command variable (if they may be used to set floor light)
-    if (led <= led_hit_4th){
-        switch (led){
-            case led_hit_1st:
 
-                break;
-        }
-        return;
-    }
-*/
-    if (state){
+    if (led == led_floor_1st){
+        io_clear_bit(LIGHT_FLOOR_IND1);
+        io_clear_bit(LIGHT_FLOOR_IND2);
+    } else if (led == led_floor_2nd){
+        io_set_bit(LIGHT_FLOOR_IND1);
+        io_clear_bit(LIGHT_FLOOR_IND2);
+    } else if (led == led_floor_3rd){
+        io_clear_bit(LIGHT_FLOOR_IND1);
+        io_set_bit(LIGHT_FLOOR_IND2);
+    } else if (led == led_floor_4th){
+        io_set_bit(LIGHT_FLOOR_IND1);
+        io_set_bit(LIGHT_FLOOR_IND2);
+    } else if (state){
         io_set_bit(led);
     } else{
         io_clear_bit(led);

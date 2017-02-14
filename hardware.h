@@ -16,6 +16,9 @@
 #define MOTORDIR            (0x300+15)
 #define MOTOR               (0x100+0)
 
+#define LIGHT_FLOOR_IND2    (0x300+1)
+#define LIGHT_FLOOR_IND1    (0x300+0)
+
 typedef enum {
     door_closed,
     door_opened
@@ -35,10 +38,10 @@ typedef enum {
 }   Sensor_floor_t;
 
 typedef enum {
-    led_hit_1st     = (0x300+13),
-    led_hit_2nd     = (0x300+12),
-    led_hit_3rd     = (0x300+11),
-    led_hit_4th     = (0x300+10),
+    led_dropoff_1st = (0x300+13),
+    led_dropoff_2nd = (0x300+12),
+    led_dropoff_3rd = (0x300+11),
+    led_dropoff_4th = (0x300+10),
     led_up_1st      = (0x300+9),
     led_down_2nd    = (0x300+7),
     led_up_2nd      = (0x300+8),
@@ -47,6 +50,10 @@ typedef enum {
     led_down_4th    = (0x300+4),
     led_stop        = (0x300+14),
     led_door        = (0x300+3)
+    led_floor_1st   = ,
+    led_floor_2nd   = ,
+    led_floor_3rd   = ,
+    led_floor_4th   = ,
 }   Led_button_t;
 
 typedef enum {
