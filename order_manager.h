@@ -1,5 +1,5 @@
-#ifndef _ORDER_MANAGER_H_
-#define _ORDER_MANAGER_H_
+#ifndef __ORDER_MANAGER_H__
+#define __ORDER_MANAGER_H__
 
 typedef enum {
 	floor_unknown = -1
@@ -21,12 +21,11 @@ typedef struct {
 	Floor_t dropoff_floor;			// Settes når heisen har nådd pickup-floor
 } Order_t;
 
+void om_add_new_order (Order_t);
+Order_t om_get_first_order (void);
+bool om_add_dropoff_to_order (Order_t, Floor_t);
+void om_remove_order (Order_t);
+bool om_contains_pickup (Floor_t, Direction_t);
+bool om_contains_dropoff (Floor_t);
 
-void om_add_new_order (Order_t)
-Order_t om_get_first_order (void)
-bool om_add_dropoff_to_order (Order_t, Floor_t)
-void om_remove_order (Order_t)
-bool om_contains_pickup (Floor_t, Direction_t)
-bool om_contains_dropoff (Floor_t)
-
-#endif // _ORDER_MANAGER_H_
+#endif // #ifndef __ORDER_MANAGER_H__
