@@ -1,3 +1,6 @@
+#ifndef __ELEVATOR_CONTROLLER_H__
+#define __ELEVATOR_CONTROLLER_H__
+
 typedef enum {
 	hit_1st,
 	hit_2nd,
@@ -17,3 +20,7 @@ typedef enum {
 	released_stop,
 	timer_timeout,
 } Event_t;
+
+void ec_event_raise(Event_t event);
+
+#endif // #ifndef __ELEVATOR_CONTROLLER_H__

@@ -13,7 +13,7 @@ int main() {
 
     while (1) {
         switch (hw_get_sensors_state()) {
-            case floor_1st:
+            case floor_sensor_1st:
                 hw_set_led_state(led_floor_1st, true);
                 hw_set_motor_state(stopped);
                 timer_reset();
@@ -22,15 +22,17 @@ int main() {
                 timer_reset();
                 while(!timer_is_timed_out()) {}
                 break;
-            case floor_2nd:
+            case floor_sensor_2nd:
                 hw_set_led_state(led_floor_2nd, true);
                 break;
-            case floor_3rd:
+            case floor_sensor_3rd:
                 hw_set_led_state(led_floor_3rd, true);
                 break;
-            case floor_4th:
+            case floor_sensor_4th:
                 hw_set_led_state(led_floor_4th, true);
                 hw_set_motor_state(moving_down);
+                break;
+            default:
                 break;
         }
 

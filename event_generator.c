@@ -20,46 +20,48 @@ struct { Button_t button; bool previous_state; Event_t event_to_raise_on_press; 
 
 bool stop_button_previous_state = false;
 
-FloorSensor_t previous_floor = floor_unknown;
+Floor_sensor_t previous_floor = floor_sensor_none;
 
 void event_generator(void){
 	while (true) {
 		// Handle buttons other than the stop button
 		for (int index = 0; index < sizeof(buttons) / sizeof(buttons[0]) ; index++) {
-			bool current_state = hw_is_button_pressed(buttons[i].button)
-			if (current_state && !buttons[i].previous_state) {
-				ec_raise_event(buttons[i].event_to_raise_on_press);
+			bool current_state = hw_is_button_pressed(buttons[index].button);
+			if (current_state && !buttons[index].previous_state) {
+				ec_event_raise(buttons[index].event_to_raise_on_press);
 			}
-			buttons[i].previous_state = current_state;
+			buttons[index].previous_state = current_state;
 		}
 		
 		
 		// Handle stop button
 		bool stop_button_current_state = hw_is_button_pressed(button_stop);
 		if (stop_button_current_state == false && stop_button_previous_state == true) {
-			ec_raise_event(released_stop);
+			ec_event_raise(released_stop);
 		}
 		if (stop_button_current_state == true && stop_button_previous_state == false) {
-			ec_raise_event(pressed_stop);
+			ec_event_raise(pressed_stop);
 		}
 		stop_button_previous_state = hw_is_button_pressed(button_stop);
 		
 		
 		// Handle floors
-		Floor_t current_floor = hw_get_sensors_state();
+		Floor_sensor_t current_floor = hw_get_sensors_state();
 		if (current_floor != previous_floor) {
 			switch (current_floor) {
-				case floor_1st: 
-					ec_raise_event(hit_1st);
+				case floor_sensor_1st: 
+					ec_event_raise(hit_1st);
 					break;
-				case floor_2nd: 
-					ec_raise_event(hit_2nd);
+				case floor_sensor_2nd: 
+					ec_event_raise(hit_2nd);
 					break;
-				case floor_3rd: 
-					ec_raise_event(hit_3rd);
+				case floor_sensor_3rd: 
+					ec_event_raise(hit_3rd);
 					break;
-				case floor_4th: 
-					ec_raise_event(hit_4th);
+				case floor_sensor_4th: 
+					ec_event_raise(hit_4th);
+					break;
+				default:
 					break;
 			}
 		}

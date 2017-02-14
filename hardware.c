@@ -227,13 +227,13 @@ bool hw_is_button_pressed(Button_t button){
 
 Floor_sensor_t hw_get_sensors_state(void){
     if(io_read_bit(SENSOR_FLOOR1)){
-        return floor_1st;
+        return floor_sensor_1st;
     } else if (io_read_bit(SENSOR_FLOOR2)){
-        return floor_2nd;
+        return floor_sensor_2nd;
     } else if (io_read_bit(SENSOR_FLOOR3)){
-        return floor_3rd;
+        return floor_sensor_3rd;
     } else if (io_read_bit(SENSOR_FLOOR4)){
-        return floor_4th;
+        return floor_sensor_4th;
     }
-    return floor_none;
+    return floor_sensor_none;
 }

@@ -5,8 +5,8 @@
 // These functions provides an interface to the elevators in the real time lab
 //
 // 2007, Martin Korsgaard
-#ifndef __INCLUDE_DRIVER_H__
-#define __INCLUDE_DRIVER_H__
+#ifndef __INCLUDE_HARDWARE_H__
+#define __INCLUDE_HARDWARE_H__
 
 
 #define SENSOR_FLOOR1       (0x200+4)
@@ -29,13 +29,6 @@ typedef enum {
     stopped = 0,
     moving_up  = 1
 }   Motor_state_t;
-
-typedef enum {
-    hit_1st,
-    hit_2nd,
-    hit_3rd,
-    hit_4th,
-}   Sensor_floor_t;
 
 typedef enum {
     led_stop        = (0x300+14),
@@ -71,11 +64,11 @@ typedef enum {
 }   Button_t;
 
 typedef enum {
-    floor_none,
-    floor_1st,
-    floor_2nd,
-    floor_3rd,
-    floor_4th
+    floor_sensor_none,
+    floor_sensor_1st,
+    floor_sensor_2nd,
+    floor_sensor_3rd,
+    floor_sensor_4th
 }   Floor_sensor_t;
 
 
@@ -199,4 +192,4 @@ Floor_sensor_t hw_get_sensors_state(void);
 
 
 
-#endif // #ifndef __INCLUDE_DRIVER_H__
+#endif // #ifndef __INCLUDE_HARDWARE_H__
