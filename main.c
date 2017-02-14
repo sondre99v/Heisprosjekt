@@ -1,4 +1,5 @@
 #include "hardware.h"
+#include "timer.h"
 #include <stdio.h>
 
 
@@ -14,7 +15,12 @@ int main() {
         switch (hw_get_sensors_state()) {
             case floor_1st:
                 hw_set_led_state(led_floor_1st, true);
+                hw_set_motor_state(stopped);
+                timer_reset();
+                while(!timer_is_timed_out()) {}
                 hw_set_motor_state(moving_up);
+                timer_reset();
+                while(!timer_is_timed_out()) {}
                 break;
             case floor_2nd:
                 hw_set_led_state(led_floor_2nd, true);
