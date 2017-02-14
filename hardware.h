@@ -49,11 +49,11 @@ typedef enum {
     led_up_3rd      = (0x300+6),
     led_down_4th    = (0x300+4),
     led_stop        = (0x300+14),
-    led_door        = (0x300+3)
-    led_floor_1st   = ,
-    led_floor_2nd   = ,
-    led_floor_3rd   = ,
-    led_floor_4th   = ,
+    led_door        = (0x300+3),
+    led_floor_1st,
+    led_floor_2nd,
+    led_floor_3rd,
+    led_floor_4th
 }   Led_button_t;
 
 typedef enum {
