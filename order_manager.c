@@ -2,8 +2,7 @@
 #include <stdlib.h>
 
 // The order queue is implemented as a singly linked list.
-struct Order_list_node_t;
-typedef struct {
+typedef struct Order_list_node_t{
 	Order_t order;
 	Order_list_node_t* next;
 } Order_list_node_t;
@@ -17,7 +16,7 @@ static Order_list_node_t* _find_node_with_order (Order_t* order) {
 	
 	Order_list_node_t* node = order_queue;
 	
-	while (node -> order != order) {
+	while (&(node -> order) != order) {
 		node = node -> next;
 		if (node == NULL) {
 			return NULL;

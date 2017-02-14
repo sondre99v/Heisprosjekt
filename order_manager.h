@@ -1,8 +1,10 @@
 #ifndef __ORDER_MANAGER_H__
 #define __ORDER_MANAGER_H__
 
+#include <stdbool.h>
+
 typedef enum {
-	floor_unknown = -1
+	floor_unknown = -1,
 	floor_1st = 1,
 	floor_2nd = 2,
 	floor_3rd = 3,
