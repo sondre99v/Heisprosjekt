@@ -4,13 +4,14 @@
 // 2007, Martin Korsgaard
 
 
-#include "channels.h"
-#include "elev.h"
+//#include "channels.h"
+#include "hardware.h"
 #include "io.h"
 
 #include <assert.h>
 #include <stdlib.h>
 
+/*
 // Number of signals and lamps on a per-floor basis (excl sensor)
 #define N_BUTTONS 3
 
@@ -143,4 +144,66 @@ void elev_set_button_lamp(elev_button_type_t button, int floor, int value) {
         io_set_bit(lamp_channel_matrix[floor][button]);
     else
         io_clear_bit(lamp_channel_matrix[floor][button]);
+}
+
+*/
+
+//Our own functions
+
+void hw_set_motor_state(Motor_state_t state){
+    int motor_speed = 2800;
+
+    switch (state) {
+        case moving_down:
+            io_set_bit(MOTORDIR);
+            io_write_analog(MOTOR, motor_speed);
+            break;
+        case stopped:
+            io_write_analog(MOTOR,0);
+            break;
+        case moving_up:
+            io_clear_bit(MOTORDIR);
+            io_write_analog(MOTOR, motor_speed);
+    }
+    return;
+}
+
+void hw_set_led_state(Led_button_t led, bool state){
+    /* Maybe this is not needed, that depends on the light_command variable (if they may be used to set floor light)
+    if (led <= led_hit_4th){
+        switch (led){
+            case led_hit_1st:
+
+                break;
+        }
+        return;
+    }
+*/
+    if (state){
+        io_set_bit(led);
+    } else{
+        io_clear_bit(led);
+    }
+    return;
+}
+
+void hw_set_door_state(Door_state_t state){
+    hw_set_led_state(led_door,state);
+}
+
+bool hw_is_button_pressed(Button_t button){
+    return io_read_bit(button);
+}
+
+Floor_t hw_get_sensors_state(void){
+    if(io_read_bit(SENSOR_FLOOR1)){
+        return floor_1st;
+    } else if (io_read_bit(SENSOR_FLOOR2)){
+        return floor_2nd;
+    } else if (io_read_bit(SENSOR_FLOOR3)){
+        return floor_3rd;
+    } else if (io_read_bit(SENSOR_FLOOR4)){
+        return floor_4th;
+    }
+    return floor_none;
 }
