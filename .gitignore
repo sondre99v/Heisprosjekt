@@ -34,8 +34,13 @@ CMakeLists.txt
 *.i*86
 *.x86_64
 *.hex
+heis
 
 
 # Debug files
 *.dSYM/
 *.su
+
+# I dunno
+*.c~
+*.c.save
