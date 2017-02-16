@@ -1,6 +1,7 @@
 //Author: Finn Matras & Sondre Ninive Andersen
 
 #include "order_manager.h"
+#include <stdio.h>
 #include <stdlib.h>
 
 // The order queue is implemented as a singly linked list.

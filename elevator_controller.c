@@ -97,31 +97,42 @@ static void _event_handle_hit_4th() {
 
 static void _event_handle_pressed_up_1st() {
 	printf("Event pressed up 1st\n");
-
+	om_add_new_order(floor_1st, direction_up);
+	hw_set_led_state(led_up_1st, true);
 }
 
 static void _event_handle_pressed_down_2nd() {
 	printf("Event pressed down 2nd\n");
+	om_add_new_order(floor_2nd, direction_down);
+	hw_set_led_state(led_down_2nd, true);
 
 }
 
 static void _event_handle_pressed_up_2nd() {
 	printf("Event pressed up 2nd\n");
+	om_add_new_order(floor_2nd, direction_up);
+	hw_set_led_state(led_up_2nd, true);
 
 }
 
 static void _event_handle_pressed_down_3rd() {
 	printf("Event pressed down 3rd\n");
+	om_add_new_order(floor_3rd, direction_down);
+	hw_set_led_state(led_down_3rd, true);
 
 }
 
 static void _event_handle_pressed_up_3rd() {
 	printf("Event pressed up 3rd\n");
+	om_add_new_order(floor_3rd, direction_up);
+	hw_set_led_state(led_up_3rd, true);
 
 }
 
 static void _event_handle_pressed_down_4th() {
 	printf("Event pressed down 4th\n");
+	om_add_new_order(floor_4th, direction_down);
+	hw_set_led_state(led_down_4th, true);
 
 }
 
