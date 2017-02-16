@@ -42,6 +42,11 @@ static Order_list_node_t* _create_new_node (Floor_t pickup_floor, Direction_t di
 }
 
 void om_add_new_order (Floor_t pickup_floor, Direction_t direction) {
+	// Check if queue contains this order already
+	if (om_contains_pickup(pickup_floor, direction)) {
+		return;
+	}
+
 	// Create new node with given values
 	Order_list_node_t* new_order_node = _create_new_node(pickup_floor, direction, floor_unknown, order_queue);
 	
