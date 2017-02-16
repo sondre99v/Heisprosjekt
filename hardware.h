@@ -69,7 +69,7 @@ typedef enum {
 
 //Addresses to locations of floor sensors
 typedef enum {
-    floor_sensor_none,
+    floor_sensor_none = -1,
     floor_sensor_1st = (0x200+4),
     floor_sensor_2nd = (0x200+5),
     floor_sensor_3rd = (0x200+6),

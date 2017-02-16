@@ -15,6 +15,7 @@ struct
 	Floor_t last_floor;
 	Door_state_t door_state;
 	Motor_state_t motor_state;
+	Order_t* current_processed_order;		//Find a better name!
 } elevator_state;
 
 
@@ -76,6 +77,11 @@ static void _event_handle_startup() {
 }
 
 static void _event_handle_hit_1st() {
+	if (om_contains_dropoff(floor_1st)){
+		_action_stop_moving();
+		_action_open_door();
+		timer_reset();
+	}
 	printf("Event hit 1st\n");
 	_action_move_up();
 }
@@ -138,36 +144,74 @@ static void _event_handle_pressed_down_4th() {
 
 static void _event_handle_pressed_elevator_1st() {
 	printf("Event pressed elevator 1st\n");
+	if (elevator_state.motor_state == moving_down){
+		om_add_dropoff_to_order(elevator_state.last_floor, direction_down, floor_1st);
+	} else if (elevator_state.motor_state == moving_up){
+		om_add_dropoff_to_order(elevator_state.last_floor, direction_up, floor_1st);
+	} else if (elevator_state.motor_state == stopped) {
+		om_add_new_dropoff_only_order(floor_1st);
+	}
+	hw_set_led_state(led_dropoff_1st, true);
 
 }
 
 static void _event_handle_pressed_elevator_2nd() {
 	printf("Event pressed elevator 2nd\n");
+	if (elevator_state.motor_state == moving_down){
+		om_add_dropoff_to_order(elevator_state.last_floor, direction_down, floor_2nd);
+	} else if (elevator_state.motor_state == moving_up){
+		om_add_dropoff_to_order(elevator_state.last_floor, direction_up, floor_2nd);
+	} else if (elevator_state.motor_state == stopped) {
+		om_add_new_dropoff_only_order(floor_2nd);
+	}
+	hw_set_led_state(led_dropoff_2nd, true);
 
 }
 
 static void _event_handle_pressed_elevator_3rd() {
 	printf("Event pressed elevator 3rd\n");
-
+	if (elevator_state.motor_state == moving_down){
+		om_add_dropoff_to_order(elevator_state.last_floor, direction_down, floor_3rd);
+	} else if (elevator_state.motor_state == moving_up){
+		om_add_dropoff_to_order(elevator_state.last_floor, direction_up, floor_3rd);
+	} else if (elevator_state.motor_state == stopped) {
+		om_add_new_dropoff_only_order(floor_3rd);
+	}
+	hw_set_led_state(led_dropoff_3rd, true);	
 }
 
 static void _event_handle_pressed_elevator_4th() {
 	printf("Event pressed elevator 4th\n");
-
+		if (elevator_state.motor_state == moving_down){
+		om_add_dropoff_to_order(elevator_state.last_floor, direction_down, floor_4th);
+	} else if (elevator_state.motor_state == moving_up){
+		om_add_dropoff_to_order(elevator_state.last_floor, direction_up, floor_4th);
+	} else if (elevator_state.motor_state == stopped) {
+		om_add_new_dropoff_only_order(floor_4th);
+	}
+	hw_set_led_state(led_dropoff_4th, true);
 }
 
 static void _event_handle_pressed_stop() {
 	printf("Event pressed emergency stop\n");
+	_action_stop_moving();
+	om_clear_all_orders();
+	if (hw_get_sensors_state() != -1){
+		_action_open_door();
+	} else {_action_close_door();}
+	hw_set_led_state(led_stop, true);
 }
 
 static void _event_handle_released_stop() {
 	printf("Event released emergency stop\n");
-
+	hw_set_led_state(led_stop, false);
 }
 
 static void _event_handle_timer_timeout() {
 	printf("Event timer timeout\n");
-
+	_action_close_door();
+	current_processed_order = om_get_first_order();
+	//If there is a dropoff floor, go to it, if not, go to the pickup floor.
 }
 
 void ec_event_raise(Event_t event) {
