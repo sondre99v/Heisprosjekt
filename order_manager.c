@@ -3,6 +3,7 @@
 #include "order_manager.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 // The order queue is implemented as a singly linked list.
 typedef struct Order_list_node_t{

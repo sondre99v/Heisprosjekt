@@ -5,6 +5,8 @@
 
 #include <stdbool.h>
 
+#define _DEBUG_MESSAGES_
+
 typedef enum {
 	floor_unknown = -1,
 	floor_1st = 1,
