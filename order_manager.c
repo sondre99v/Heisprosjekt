@@ -127,7 +127,7 @@ Order_t* om_get_first_order (void) {
 		while (node -> next != NULL) {
 			node = node -> next;
 		}
-		return node -> order;
+		return &(node -> order);
 	}
 }
 

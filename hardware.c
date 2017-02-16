@@ -49,7 +49,6 @@ void hw_set_motor_state(Motor_state_t state){
     return;
 }
 
-
 void hw_set_led_state(Led_t led, bool state){
 
     if (led == led_floor_1st){

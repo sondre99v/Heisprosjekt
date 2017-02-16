@@ -33,6 +33,10 @@ typedef enum {
 
 //Addresses for LED's, exception: led_floor_xxx, see on #define's
 typedef enum {
+    led_floor_1st,
+    led_floor_2nd,
+    led_floor_3rd,
+    led_floor_4th,
     led_stop        = (0x300+14),
     led_dropoff_1st = (0x300+13),
     led_dropoff_2nd = (0x300+12),
@@ -44,11 +48,7 @@ typedef enum {
     led_up_3rd      = (0x300+6),
     led_down_3rd    = (0x300+5),
     led_down_4th    = (0x300+4),
-    led_door        = (0x300+3),
-    led_floor_1st,
-    led_floor_2nd,
-    led_floor_3rd,
-    led_floor_4th
+    led_door        = (0x300+3)
 }   Led_t;
 
 //Addresses to all buttons used to control the elevator
