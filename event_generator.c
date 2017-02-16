@@ -1,3 +1,5 @@
+//Author: Finn Matras & Sondre Ninive Andersen
+
 #include "event_generator.h"
 
 #include <stdbool.h>

@@ -1,35 +1,37 @@
-#include <stdbool.h>
+//Author: Finn Matras & Sondre Ninive Andersen
 
-
-// Wrapper for libComedi Elevator control.
-// These functions provides an interface to the elevators in the real time lab
-//
-// 2007, Martin Korsgaard
 #ifndef __INCLUDE_HARDWARE_H__
 #define __INCLUDE_HARDWARE_H__
 
+#include <stdbool.h>
 
-#define SENSOR_FLOOR1       (0x200+4)
-#define SENSOR_FLOOR2       (0x200+5)
-#define SENSOR_FLOOR3       (0x200+6)
-#define SENSOR_FLOOR4       (0x200+7)
+//#define SENSOR_FLOOR1       (0x200+4)
+//#define SENSOR_FLOOR2       (0x200+5)
+//#define SENSOR_FLOOR3       (0x200+6)
+//#define SENSOR_FLOOR4       (0x200+7)
+
+//Addresses for motor direction and speed
 #define MOTORDIR            (0x300+15)
 #define MOTOR               (0x100+0)
 
+//Addresses for controlling the floor indicator lights
 #define LIGHT_FLOOR_IND2    (0x300+1)
 #define LIGHT_FLOOR_IND1    (0x300+0)
 
+//Door states for door control
 typedef enum {
     door_closed,
     door_opened
 }   Door_state_t;
 
+//Description of elevator (motor) movement
 typedef enum {
     moving_down = -1,
     stopped = 0,
     moving_up  = 1
 }   Motor_state_t;
 
+//Addresses for LED's, exception: led_floor_xxx, see on #define's
 typedef enum {
     led_stop        = (0x300+14),
     led_dropoff_1st = (0x300+13),
@@ -49,6 +51,7 @@ typedef enum {
     led_floor_4th
 }   Led_t;
 
+//Addresses to all buttons used to control the elevator
 typedef enum {
     button_up_1st       = (0x300+17),
     button_down_2nd     = (0x200+0),
@@ -63,131 +66,35 @@ typedef enum {
     button_floor_4th    = (0x300+18)
 }   Button_t;
 
+
+//Addresses to locations of floor sensors
 typedef enum {
     floor_sensor_none,
-    floor_sensor_1st,
-    floor_sensor_2nd,
-    floor_sensor_3rd,
-    floor_sensor_4th
+    floor_sensor_1st = (0x200+4),
+    floor_sensor_2nd = (0x200+5),
+    floor_sensor_3rd = (0x200+6),
+    floor_sensor_4th = (0x200+7)
 }   Floor_sensor_t;
 
 
-/*
-// Number of floors
-#define N_FLOORS 4
 
-*/
-
-/**
-  Initialize elevator.
-  @return Non-zero on success, 0 on failure.
-*/
-//int elev_init(void);
-
-/**
-  Motor direction for function elev_set_motor_direction().
-*/
-
-/**
-  Sets the motor direction of the elevator.
-  @param dirn New direction of the elevator.
-*/
-//void elev_set_motor_direction(elev_motor_direction_t dirn);
-
-/**
-  Turn door-open lamp on or off.
-  @param value Non-zero value turns lamp on, 0 turns lamp off.
-*/
-//void elev_set_door_open_lamp(int value);
-
-
-/**
-  Get signal from obstruction switch.
-  @return 1 if obstruction is enabled. 0 if not.
-*/
-//int elev_get_obstruction_signal(void);
-
-
-
-/**
-  Get signal from stop button.
-  @return 1 if stop button is pushed, 0 if not.
-*/
-//int elev_get_stop_signal(void);
-
-
-/**
-  Turn stop lamp on or off.
-  @param value Non-zero value turns lamp on, 0 turns lamp off.
-*/
-//void elev_set_stop_lamp(int value);
-
-
-
-/**
-  Get floor sensor signal.
-  @return -1 if elevator is not on a floor. 0-3 if elevator is on floor. 0 is
-    ground floor, 3 is top floor.
-*/
-//int elev_get_floor_sensor_signal(void);
-
-
-
-/**
-  Set floor indicator lamp for a given floor.
-  @param floor Which floor lamp to turn on. Other floor lamps are turned off.
-*/
-//void elev_set_floor_indicator(int floor);
-
-
-
-/**
-  Button types for function elev_set_button_lamp() and elev_get_button().
-*/
-/*
-typedef enum tag_elev_lamp_type { 
-    BUTTON_CALL_UP = 0,
-    BUTTON_CALL_DOWN = 1,
-    BUTTON_COMMAND = 2
-} elev_button_type_t;
-*/
-
-
-/**
-  Gets a button signal.
-  @param button Which button type to check. Can be BUTTON_CALL_UP,
-    BUTTON_CALL_DOWN or BUTTON_COMMAND (button "inside the elevator).
-  @param floor Which floor to check button. Must be 0-3.
-  @return 0 if button is not pushed. 1 if button is pushed.
-*/
-//int elev_get_button_signal(elev_button_type_t button, int floor);
-
-
-
-/**
-  Set a button lamp.
-  @param lamp Which type of lamp to set. Can be BUTTON_CALL_UP,
-    BUTTON_CALL_DOWN or BUTTON_COMMAND (button "inside" the elevator).
-  @param floor Floor of lamp to set. Must be 0-3
-  @param value Non-zero value turns lamp on, 0 turns lamp off.
-*/
-//void elev_set_button_lamp(elev_button_type_t button, int floor, int value);
-
-
-
-
-//Our own functions
-
+//Initializes the hardware and sets all LED's and motor to off
 void hw_init();
 
+//Sets motor state based on state enum
 void hw_set_motor_state(Motor_state_t state);
 
+//Controls all LED's and sets Led_t led to bool state (false = off, true = on)
+//Maybe it should be on/off instead of false/true for abastraction level?????
 void hw_set_led_state(Led_t led, bool state);
 
+//Sets door state according to coor state
 void hw_set_door_state(Door_state_t state);
 
+//Returns true if Button_t button is pressed
 bool hw_is_button_pressed(Button_t button);
 
+//Returns the floor that the elevator is at, og floor_none if the elevator is in between two floors
 Floor_sensor_t hw_get_sensors_state(void);
 
 

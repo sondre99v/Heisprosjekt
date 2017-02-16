@@ -1,3 +1,5 @@
+//Author: Finn Matras & Sondre Ninive Andersen
+
 #include "hardware.h"
 #include "timer.h"
 #include <stdio.h>

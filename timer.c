@@ -1,3 +1,5 @@
+//Author: Finn Matras & Sondre Ninive Andersen
+
 #include "timer.h"
 
 #include <time.h>
