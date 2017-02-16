@@ -126,26 +126,8 @@ Order_t* om_get_first_order (void) {
 	}
 }
 
-void om_add_dropoff_to_order (Floor_t pickup_floor, Direction_t direction, Floor_t dropoff_floor) {
-	// Find order with given pick-up floor and direction
-#ifdef _DEBUG_MESSAGES_
-		printf("Looking for order\n");
-#endif
-	Order_list_node_t* node;
-	Order_t* order = NULL;
-	for (node = order_queue; node != NULL; node = node -> next) {
-		if (node -> order.pickup_floor == pickup_floor && node -> order.pickup_direction == direction) {
-			order = node -> order;
-			break;
-		}
-	}
-	
-	if (order == NULL) {
-#ifdef _DEBUG_MESSAGES_
-		printf("No order found\n");
-#endif
-		return;
-	}
+void om_add_dropoff_to_order (Order_t* order, Floor_t dropoff_floor) {
+	assert(order != NULL);
 	
 	if (order -> dropoff_floor == floor_unknown) {
 		// Order has no drop-off floor, add it.
