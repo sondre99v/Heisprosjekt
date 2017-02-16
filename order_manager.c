@@ -122,7 +122,11 @@ Order_t* om_get_first_order (void) {
 		// Order queue is empty
 		return NULL;
 	} else {
-		return &(order_queue -> order);
+		Order_list_node_t* node = order_queue;
+		while (node -> next != NULL) {
+			node = node -> next;
+		}
+		return node -> order;
 	}
 }
 
