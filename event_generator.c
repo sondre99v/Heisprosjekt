@@ -25,6 +25,9 @@ bool stop_button_previous_state = false;
 Floor_sensor_t previous_floor = floor_sensor_none;
 
 void event_generator(void){
+	// Raise startup event to initialize elevator
+	ec_event_raise(startup);
+
 	while (true) {
 		// Handle buttons other than the stop button
 		for (int index = 0; index < sizeof(buttons) / sizeof(buttons[0]) ; index++) {

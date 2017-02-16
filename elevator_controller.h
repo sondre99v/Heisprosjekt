@@ -4,6 +4,7 @@
 #define __ELEVATOR_CONTROLLER_H__
 
 typedef enum {
+	startup,
 	hit_1st,
 	hit_2nd,
 	hit_3rd,
