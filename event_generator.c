@@ -7,13 +7,15 @@
 #include "elevator_controller.h"
 #include "timer.h"
 
+// Array to iterate over the order-buttons. 
+// Stop is handeled separatly, because it needs an event on release as well.
 struct { Button_t button; bool previous_state; Event_t event_to_raise_on_press; } buttons [] = {
 	{.button = button_up_1st, .previous_state = false	, pressed_up_1st},
 	{.button = button_down_2nd, .previous_state = false	, pressed_down_2nd},
 	{.button = button_up_2nd, .previous_state = false	, pressed_up_2nd},
 	{.button = button_down_3rd, .previous_state = false	, pressed_down_3rd},
-	{.button = button_down_4th, .previous_state = false	, pressed_up_3rd},
-	{.button = button_stop, .previous_state = false		, pressed_down_4th},
+	{.button = button_up_3rd, .previous_state = false, pressed_up_3rd},
+	{.button = button_down_4th, .previous_state = false	, pressed_down_4th},
 	{.button = button_floor_1st, .previous_state = false, pressed_elevator_1st},
 	{.button = button_floor_2nd, .previous_state = false, pressed_elevator_2nd},
 	{.button = button_floor_3rd, .previous_state = false, pressed_elevator_3rd},
