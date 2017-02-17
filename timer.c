@@ -4,7 +4,7 @@
 
 #include <time.h>
 
-static clock_t last_reset_time;
+static clock_t last_reset_time = -(TIMEOUT_PERIOD_SECONDS * CLOCKS_PER_SEC + 1);
 
 void timer_reset(void) {
 	last_reset_time = clock();

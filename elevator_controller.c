@@ -9,24 +9,29 @@
 #include <assert.h>
 #include <stdio.h>
 
+typedef enum {
+	searching_floor,
+	idle,
+	moving_to_floor,
+	door_open,
+	emergency_stop
+} Fsm_state_t;
+
 struct
 {
-	bool initialization_finished;
+	Fsm_state_t fsm_state;
 	Floor_t last_floor;
-	Door_state_t door_state;
 	Motor_state_t motor_state;
 	Order_t* current_processed_order;		//Find a better name!
 } elevator_state;
 
 
 static void _action_open_door() {
-	elevator_state.door_state = door_opened;
 	hw_set_door_state(door_opened);
 	timer_reset();
 }
 
 static void _action_close_door() {
-	elevator_state.door_state = door_closed;
 	hw_set_door_state(door_closed);
 }
 
@@ -46,6 +51,8 @@ static void _action_stop_moving() {
 }
 
 static void _action_go_towards(Floor_t destination_floor) {
+	printf("Moving towards floor %d from floor %d\n", (int)destination_floor, (int)elevator_state.last_floor);
+
 	if (destination_floor > elevator_state.last_floor){
 		_action_move_up();
 	} else if (destination_floor < elevator_state.last_floor) {
@@ -62,16 +69,16 @@ static void _set_last_floor(Floor_t last_floor) {
 
 	switch (last_floor) {
 		case floor_1st:
-			hw_set_led_state(led_floor_1st, true);
+			hw_set_floor_indicator(floor_led_1st);
 			break;
 		case floor_2nd:
-			hw_set_led_state(led_floor_2nd, true);
+			hw_set_floor_indicator(floor_led_2nd);
 			break;
 		case floor_3rd:
-			hw_set_led_state(led_floor_3rd, true);
+			hw_set_floor_indicator(floor_led_3rd);
 			break;
 		case floor_4th:
-			hw_set_led_state(led_floor_4th, true);
+			hw_set_floor_indicator(floor_led_4th);
 			break;
 		default:
 			break;
@@ -84,27 +91,37 @@ static void _event_handle_startup() {
 	_action_close_door(); // Door should already be closed from hw_init, but just in case
 	_action_move_up(); // Move up to get to known location
 	elevator_state.last_floor = floor_unknown;
-	elevator_state.initialization_finished = false;
+	elevator_state.fsm_state = searching_floor;
 }
 
 static void _event_hit_floor(Floor_t hit_floor) {
+	printf("Event hit floor\n");
+	_set_last_floor(hit_floor);
+
 	// If we hit a floor for the first time, stop and set initialization to finished
-	if (!elevator_state.initialization_finished) {
+	if (elevator_state.fsm_state == searching_floor) {
 		_action_stop_moving();
-		elevator_state.initialization_finished = true;
+		elevator_state.fsm_state = idle;
 		return;
 	}
 
-	printf("Event hit floor\n");
-
-	// Check if this floor is the pickup of the most prioritized order
-	Order_t* order_at_this_floor = om_get_first_order();
-	if (order_at_this_floor != NULL && order_at_this_floor -> pickup_floor == hit_floor) {
-		printf("Stopped to pick-up first order.\n");
+	// Check if the current floor is the drop-off floor of any order
+	Order_t* order_at_this_floor = om_contains_dropoff(hit_floor);
+	if (order_at_this_floor != NULL) {
+		printf("Stopped to drop-off other order.\n");
 		_action_stop_moving();
 		_action_open_door();
-		elevator_state.current_processed_order = order_at_this_floor;
-		return;
+		elevator_state.fsm_state = door_open;
+		om_remove_orders_with_dropoff(hit_floor);
+
+		// Turn off dropoff led
+		switch (hit_floor) {
+			case floor_1st: hw_set_led_state(led_dropoff_1st, false); break;
+			case floor_2nd: hw_set_led_state(led_dropoff_2nd, false); break;
+			case floor_3rd: hw_set_led_state(led_dropoff_3rd, false); break;
+			case floor_4th: hw_set_led_state(led_dropoff_4th, false); break;
+			default: break;
+		}
 	}
 
 	// Check if this floor is the pickup of any order with the same as the current direction
@@ -121,76 +138,95 @@ static void _event_hit_floor(Floor_t hit_floor) {
 		printf("Stopped to pick-up other order.\n");
 		_action_stop_moving();
 		_action_open_door();
+		elevator_state.fsm_state = door_open;
 		elevator_state.current_processed_order = order_at_this_floor;
-		return;
 	}
 
-	// Check if the current floor is the drop-off floor of any order
-	order_at_this_floor = om_contains_dropoff(hit_floor);
-	if (order_at_this_floor != NULL) {
-		printf("Stopped to drop-off other order.\n");
+	// Check if this floor is the pickup of the most prioritized order
+	order_at_this_floor = om_get_first_order();
+	if (order_at_this_floor != NULL && order_at_this_floor -> pickup_floor == hit_floor) {
+		printf("Stopped to pick-up first order.\n");
 		_action_stop_moving();
 		_action_open_door();
-		om_remove_order(order_at_this_floor);
-		return;
+		elevator_state.fsm_state = door_open;
+		elevator_state.current_processed_order = order_at_this_floor;
 	}
 }
 
 static void _event_handle_pressed_up_1st() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed up 1st\n");
 	om_add_new_order(floor_1st, direction_up);
 	hw_set_led_state(led_up_1st, true);
+
+	if (elevator_state.fsm_state == idle) {
+		_action_go_towards(floor_1st);
+	}
 }
 
 static void _event_handle_pressed_down_2nd() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed down 2nd\n");
 	om_add_new_order(floor_2nd, direction_down);
 	hw_set_led_state(led_down_2nd, true);
 
+	if (elevator_state.fsm_state == idle) {
+		_action_go_towards(floor_2nd);
+	}
 }
 
 static void _event_handle_pressed_up_2nd() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed up 2nd\n");
 	om_add_new_order(floor_2nd, direction_up);
 	hw_set_led_state(led_up_2nd, true);
 
+	if (elevator_state.fsm_state == idle) {
+		_action_go_towards(floor_2nd);
+	}
 }
 
 static void _event_handle_pressed_down_3rd() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed down 3rd\n");
 	om_add_new_order(floor_3rd, direction_down);
 	hw_set_led_state(led_down_3rd, true);
 
+	if (elevator_state.fsm_state == idle) {
+		_action_go_towards(floor_3rd);
+	}
 }
 
 static void _event_handle_pressed_up_3rd() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed up 3rd\n");
 	om_add_new_order(floor_3rd, direction_up);
 	hw_set_led_state(led_up_3rd, true);
 
+	if (elevator_state.fsm_state == idle) {
+		_action_go_towards(floor_3rd);
+	}
 }
 
 static void _event_handle_pressed_down_4th() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed down 4th\n");
 	om_add_new_order(floor_4th, direction_down);
 	hw_set_led_state(led_down_4th, true);
 
+	if (elevator_state.fsm_state == idle) {
+		_action_go_towards(floor_4th);
+	}
 }
 
 static void _event_handle_pressed_elevator_1st() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed elevator 1st\n");
 	if (elevator_state.current_processed_order == NULL) {
@@ -200,10 +236,13 @@ static void _event_handle_pressed_elevator_1st() {
 	}
 	hw_set_led_state(led_dropoff_1st, true);
 
+	if (elevator_state.fsm_state == idle) {
+		_action_go_towards(floor_1st);
+	}
 }
 
 static void _event_handle_pressed_elevator_2nd() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed elevator 2nd\n");
 		if (elevator_state.current_processed_order == NULL) {
@@ -213,10 +252,13 @@ static void _event_handle_pressed_elevator_2nd() {
 	}
 	hw_set_led_state(led_dropoff_2nd, true);
 
+	if (elevator_state.fsm_state == idle) {
+		_action_go_towards(floor_2nd);
+	}
 }
 
 static void _event_handle_pressed_elevator_3rd() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed elevator 3rd\n");
 	if (elevator_state.current_processed_order == NULL){
@@ -224,11 +266,15 @@ static void _event_handle_pressed_elevator_3rd() {
 	} else {
 		om_add_dropoff_to_order(elevator_state.current_processed_order, floor_3rd);
 	}
-	hw_set_led_state(led_dropoff_3rd, true);	
+	hw_set_led_state(led_dropoff_3rd, true);
+
+	if (elevator_state.fsm_state == idle) {
+		_action_go_towards(floor_3rd);
+	}	
 }
 
 static void _event_handle_pressed_elevator_4th() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed elevator 4th\n");
 	if (elevator_state.current_processed_order == NULL){
@@ -237,14 +283,20 @@ static void _event_handle_pressed_elevator_4th() {
 		om_add_dropoff_to_order(elevator_state.current_processed_order, floor_4th);
 	}
 	hw_set_led_state(led_dropoff_4th, true);
+
+	if (elevator_state.fsm_state == idle) {
+		_action_go_towards(floor_4th);
+	}
 }
 
 static void _event_handle_pressed_stop() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed emergency stop\n");
 	_action_stop_moving();
 	om_clear_all_orders();
+
+	// Open door if on a floor
 	if (hw_get_sensors_state() != floor_sensor_none){
 		_action_open_door();
 	} else {
@@ -253,26 +305,37 @@ static void _event_handle_pressed_stop() {
 
 	//hw_clear_all_leds();
 	hw_set_led_state(led_stop, true);
+	elevator_state.fsm_state = emergency_stop;
 }
 
 static void _event_handle_released_stop() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor) return;
 
 	printf("Event released emergency stop\n");
 	hw_set_led_state(led_stop, false);
+	timer_reset();
+
+	elevator_state.fsm_state = idle;
 }
 
 static void _event_handle_timer_timeout() {
-	if (!elevator_state.initialization_finished) return;
+	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event timer timeout\n");
 	_action_close_door();
 	elevator_state.current_processed_order = NULL;
+
 	Order_t* next_order = om_get_first_order();
-	if (next_order->dropoff_floor != floor_unknown){
-		_action_go_towards(next_order->dropoff_floor);
+	if (next_order != NULL) {
+		if (next_order->dropoff_floor != floor_unknown){
+			_action_go_towards(next_order -> dropoff_floor);
+		} else {
+			_action_go_towards(next_order -> pickup_floor);
+		}
+		elevator_state.fsm_state = moving_to_floor;
+	} else {
+		elevator_state.fsm_state = idle;
 	}
-	//If there is a dropoff floor, go to it, if not, go to the pickup floor.
 }
 
 void ec_event_raise(Event_t event) {
@@ -293,8 +356,7 @@ void ec_event_raise(Event_t event) {
 			_event_hit_floor(floor_4th);
 			break;
 		case pressed_up_1st:
-			if (elevator_state.initialization_finished)
-				_event_handle_pressed_up_1st();
+			_event_handle_pressed_up_1st();
 			break;
 		case pressed_down_2nd:
 			_event_handle_pressed_down_2nd();

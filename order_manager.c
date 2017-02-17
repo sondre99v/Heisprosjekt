@@ -13,6 +13,7 @@ typedef struct Order_list_node_t{
 
 static Order_list_node_t* order_queue = NULL;
 
+
 static void _print_order_queue() {
 	Order_list_node_t* node;
 	
@@ -47,6 +48,7 @@ static void _print_order_queue() {
 	}
 }
 
+
 static Order_list_node_t* _find_node_with_order (Order_t* order) {
 	if (order_queue == NULL) {
 		return NULL;
@@ -64,6 +66,7 @@ static Order_list_node_t* _find_node_with_order (Order_t* order) {
 	return node;
 }
 
+
 static Order_list_node_t* _create_new_node (Floor_t pickup_floor, Direction_t direction, Floor_t dropoff_floor, Order_list_node_t* next) {
 	// Allocate memory for new order
 	Order_list_node_t* new_order_node = malloc(sizeof(Order_list_node_t));
@@ -76,6 +79,51 @@ static Order_list_node_t* _create_new_node (Floor_t pickup_floor, Direction_t di
 	
 	return new_order_node;
 }
+
+
+static void _remove_node(Order_list_node_t* node) {
+	if (order_queue == NULL) {
+		// There are no orders to remove
+		return;
+	}
+	
+	if (node == order_queue) {
+		// Order to remove was first in the queue
+		Order_list_node_t* to_delete = order_queue;
+		order_queue = order_queue -> next;
+		free(to_delete);
+#ifdef _DEBUG_MESSAGES_
+		printf("Order removed successfully (was 1st in queue)\n");
+		_print_order_queue();
+#endif
+		return;
+	}
+	
+	// Search through queue to find the order before the one to remove
+	Order_list_node_t* iterating_node = order_queue;
+	
+	while (iterating_node -> next != node) {
+		iterating_node = iterating_node -> next;
+		if (iterating_node -> next == NULL) {
+			// Order to remove was not found in the queue
+			return;	
+#ifdef _DEBUG_MESSAGES_
+			printf("Order to delete was not found\n");
+#endif
+		}
+	}
+	
+	// Found order before the one to remove
+	Order_list_node_t* to_delete = iterating_node -> next;
+	iterating_node -> next = iterating_node -> next -> next;
+	free(to_delete);
+	
+#ifdef _DEBUG_MESSAGES_
+	printf("Order removed successfully!\n");
+	_print_order_queue();
+#endif
+}
+
 
 void om_add_new_order (Floor_t pickup_floor, Direction_t direction) {
 	// Check if queue contains this order already
@@ -98,6 +146,7 @@ void om_add_new_order (Floor_t pickup_floor, Direction_t direction) {
 #endif
 }
 
+
 void om_add_new_dropoff_only_order (Floor_t dropoff_floor) {
 	// Check if queue contains this order already
 	if (om_contains_dropoff(dropoff_floor)) {
@@ -118,6 +167,7 @@ void om_add_new_dropoff_only_order (Floor_t dropoff_floor) {
 #endif
 }
 
+
 Order_t* om_get_first_order (void) {
 	if (order_queue == NULL) {
 		// Order queue is empty
@@ -130,6 +180,7 @@ Order_t* om_get_first_order (void) {
 		return &(node -> order);
 	}
 }
+
 
 void om_add_dropoff_to_order (Order_t* order, Floor_t dropoff_floor) {
 	assert(order != NULL);
@@ -150,58 +201,30 @@ void om_add_dropoff_to_order (Order_t* order, Floor_t dropoff_floor) {
 #endif
 }
 
-void om_remove_order (Order_t* order) {
-	if (order_queue == NULL) {
-		// There are no orders to remove
-		return;
-	}
-	
-	if (&(order_queue -> order) == order) {
-		// Order to remove was first in the queue
-		Order_list_node_t* to_delete = order_queue;
-		order_queue = order_queue -> next;
-		free(to_delete);
-#ifdef _DEBUG_MESSAGES_
-		printf("Order removed successfully (was 1st in queue)\n");
-		_print_order_queue();
-#endif
-		return;
-	}
-	
-	// Search through queue to find the order before the one to remove
+
+void om_remove_orders_with_dropoff (Floor_t dropoff_floor) {
 	Order_list_node_t* node = order_queue;
-	
-	while (&(node -> next -> order) != order) {
-		node = node -> next;
-		if (node -> next == NULL) {
-			// Order to remove was not found in the queue
-			return;	
-#ifdef _DEBUG_MESSAGES_
-			printf("Order to delete was not found\n");
-#endif
+
+	while (node != NULL) {
+		Order_list_node_t* next_node = node -> next;
+		if (node -> order.dropoff_floor == dropoff_floor) {
+			_remove_node(node);
 		}
+		node = next_node;
 	}
-	
-	// Found order before the one to remove
-	Order_list_node_t* to_delete = node -> next;
-	node -> next = node -> next -> next;
-	free(to_delete);
-	
-#ifdef _DEBUG_MESSAGES_
-	printf("Order removed successfully!\n");
-	_print_order_queue();
-#endif
 }
+
 
 void om_clear_all_orders (void) {
 	while (order_queue != NULL) {
-		om_remove_order (&(order_queue -> order));
+		_remove_node(order_queue);
 	}
 #ifdef _DEBUG_MESSAGES_
 	printf("Order queue cleared successfully!\n");
 	_print_order_queue();
 #endif
 }
+
 
 Order_t* om_contains_pickup (Floor_t pickup_floor, Direction_t direction) {
 	Order_list_node_t* node;
@@ -216,6 +239,7 @@ Order_t* om_contains_pickup (Floor_t pickup_floor, Direction_t direction) {
 	
 	return NULL;
 }
+
 
 Order_t* om_contains_dropoff (Floor_t dropoff_floor) {
 	Order_list_node_t* node;
