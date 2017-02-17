@@ -31,12 +31,15 @@ typedef enum {
     moving_up  = 1
 }   Motor_state_t;
 
+typedef enum {
+    floor_led_1st,
+    floor_led_2nd,
+    floor_led_3rd,
+    floor_led_4th
+} Floor_led_t;
+
 //Addresses for LED's, exception: led_floor_xxx, see on #define's
 typedef enum {
-    led_floor_1st,
-    led_floor_2nd,
-    led_floor_3rd,
-    led_floor_4th,
     led_stop        = (0x300+14),
     led_dropoff_1st = (0x300+13),
     led_dropoff_2nd = (0x300+12),
@@ -87,6 +90,10 @@ void hw_set_motor_state(Motor_state_t state);
 //Controls all LED's and sets Led_t led to bool state (false = off, true = on)
 //Maybe it should be on/off instead of false/true for abastraction level?????
 void hw_set_led_state(Led_t led, bool state);
+
+void hw_clear_all_leds();
+
+void hw_set_floor_indicator(Floor_led_t floor);
 
 //Sets door state according to coor state
 void hw_set_door_state(Door_state_t state);
