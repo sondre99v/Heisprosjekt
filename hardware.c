@@ -10,6 +10,7 @@ void hw_init(){
 
     //Sets all LED's to off
     hw_clear_all_leds();
+    hw_set_floor_indicator(floor_led_1st);
 
     //Turns motor off
     hw_set_motor_state(stopped);
@@ -55,8 +56,6 @@ void hw_clear_all_leds(void){
     hw_set_led_state(led_up_3rd,false);
     hw_set_led_state(led_down_3rd,false);
     hw_set_led_state(led_down_4th,false);
-    hw_set_led_state(led_door,false);
-    hw_set_floor_indicator(floor_led_1st); //This has to be implemented correclty.
 }
 
 

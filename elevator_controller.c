@@ -176,6 +176,7 @@ static void _event_handle_pressed_order_button(Floor_t order_floor, Direction_t 
 
 	if (elevator_state.fsm_state == idle) {
 		_action_go_towards(order_floor);
+		elevator_state.fsm_state = moving_to_floor;
 	}
 }
 
@@ -183,6 +184,7 @@ static void _event_handle_pressed_order_button(Floor_t order_floor, Direction_t 
 static void _event_handle_pressed_elevator_button(Floor_t button_floor) {
 	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
+	// VI kan ikke bare ignorere knappen... må håndtere det intelligent...
 	if ((elevator_state.fsm_state == idle || elevator_state.fsm_state == door_open) && elevator_state.last_floor == button_floor) {
 		// Ignore dropoff requests for the current floor
 		return;
@@ -198,6 +200,7 @@ static void _event_handle_pressed_elevator_button(Floor_t button_floor) {
 
 	if (elevator_state.fsm_state == idle) {
 		_action_go_towards(button_floor);
+		elevator_state.fsm_state = moving_to_floor;
 	}
 }
 
