@@ -7,6 +7,7 @@
 
 #define TIMEOUT_PERIOD_SECONDS 3
 
+void timer_init(void);
 void timer_reset(void);
 bool timer_is_timed_out(void);
 

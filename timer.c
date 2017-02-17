@@ -4,12 +4,16 @@
 
 #include <time.h>
 
-static clock_t last_reset_time = -(TIMEOUT_PERIOD_SECONDS * CLOCKS_PER_SEC + 1);
+static clock_t timeout_time;
+
+void timer_init() {
+	timeout_time = 0;
+}
 
 void timer_reset(void) {
-	last_reset_time = clock();
+	timeout_time = clock() + TIMEOUT_PERIOD_SECONDS * CLOCKS_PER_SEC;
 }
 
 bool timer_is_timed_out(void) {
-	return (clock() - last_reset_time >= TIMEOUT_PERIOD_SECONDS * CLOCKS_PER_SEC);
+	return (clock() >= timeout_time);
 }

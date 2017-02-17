@@ -202,6 +202,12 @@ void om_add_dropoff_to_order (Order_t* order, Floor_t dropoff_floor) {
 }
 
 
+void om_remove_order (Order_t* order) {
+	Order_list_node_t* node = _find_node_with_order(order);
+	_remove_node(node);
+}
+
+
 void om_remove_orders_with_dropoff (Floor_t dropoff_floor) {
 	Order_list_node_t* node = order_queue;
 

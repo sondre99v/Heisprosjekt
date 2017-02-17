@@ -26,7 +26,7 @@ bool stop_button_previous_state = false;
 
 Floor_sensor_t previous_floor = floor_sensor_none;
 
-bool timer_timeout_last_value = false;
+bool timer_timeout_last_value = true;
 
 void event_generator(void){
 	// Raise startup event to initialize elevator
