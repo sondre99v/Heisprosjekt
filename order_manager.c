@@ -92,10 +92,10 @@ static void _remove_node(Order_list_node_t* node) {
 		Order_list_node_t* to_delete = order_queue;
 		order_queue = order_queue -> next;
 		free(to_delete);
-#ifdef _DEBUG_MESSAGES_
+		#ifdef _DEBUG_MESSAGES_
 		printf("Order removed successfully (was 1st in queue)\n");
 		_print_order_queue();
-#endif
+		#endif
 		return;
 	}
 	
@@ -107,9 +107,9 @@ static void _remove_node(Order_list_node_t* node) {
 		if (iterating_node -> next == NULL) {
 			// Order to remove was not found in the queue
 			return;	
-#ifdef _DEBUG_MESSAGES_
+			#ifdef _DEBUG_MESSAGES_
 			printf("Order to delete was not found\n");
-#endif
+			#endif
 		}
 	}
 	
@@ -118,10 +118,10 @@ static void _remove_node(Order_list_node_t* node) {
 	iterating_node -> next = iterating_node -> next -> next;
 	free(to_delete);
 	
-#ifdef _DEBUG_MESSAGES_
+	#ifdef _DEBUG_MESSAGES_
 	printf("Order removed successfully!\n");
 	_print_order_queue();
-#endif
+	#endif
 }
 
 
@@ -129,9 +129,9 @@ void om_add_new_order (Floor_t pickup_floor, Direction_t direction) {
 	// Check if queue contains this order already
 	Order_t* old_order = om_contains_pickup(pickup_floor, direction);
 	if (old_order != NULL && old_order -> dropoff_floor == floor_unknown) {
-#ifdef _DEBUG_MESSAGES_
+		#ifdef _DEBUG_MESSAGES_
 		printf("Order already present.\n");
-#endif
+		#endif
 		return;
 	}
 
@@ -141,18 +141,18 @@ void om_add_new_order (Floor_t pickup_floor, Direction_t direction) {
 	// Set the new node as the first in the queue
 	order_queue = new_order_node;
 	
-#ifdef _DEBUG_MESSAGES_
+	#ifdef _DEBUG_MESSAGES_
 	_print_order_queue();
-#endif
+	#endif
 }
 
 
 void om_add_new_dropoff_only_order (Floor_t dropoff_floor) {
 	// Check if queue contains this order already
 	if (om_contains_dropoff(dropoff_floor)) {
-#ifdef _DEBUG_MESSAGES_
+		#ifdef _DEBUG_MESSAGES_
 		printf("Dropoff floor already present.\n");
-#endif
+		#endif
 		return;
 	}
 
@@ -162,9 +162,9 @@ void om_add_new_dropoff_only_order (Floor_t dropoff_floor) {
 	// Set the new node as the first in the queue
 	order_queue = new_order_node;
 	
-#ifdef _DEBUG_MESSAGES_
+	#ifdef _DEBUG_MESSAGES_
 	_print_order_queue();
-#endif
+	#endif
 }
 
 
@@ -195,10 +195,10 @@ void om_add_dropoff_to_order (Order_t* order, Floor_t dropoff_floor) {
 		node -> next = new_node;
 	}
 	
-#ifdef _DEBUG_MESSAGES_
+	#ifdef _DEBUG_MESSAGES_
 	printf("Dropoff floor added successfully!\n");
 	_print_order_queue();
-#endif
+	#endif
 }
 
 
@@ -225,10 +225,10 @@ void om_clear_all_orders (void) {
 	while (order_queue != NULL) {
 		_remove_node(order_queue);
 	}
-#ifdef _DEBUG_MESSAGES_
+	#ifdef _DEBUG_MESSAGES_
 	printf("Order queue cleared successfully!\n");
 	_print_order_queue();
-#endif
+	#endif
 }
 
 
@@ -236,9 +236,9 @@ Order_t* om_contains_pickup (Floor_t pickup_floor, Direction_t direction) {
 	Order_list_node_t* node;
 	for (node = order_queue ; node != NULL ; node = node -> next) {
 		if (node -> order.pickup_floor == pickup_floor && node -> order.pickup_direction == direction) {
-#ifdef _DEBUG_MESSAGES_
+			#ifdef _DEBUG_MESSAGES_
 			printf("Found order with pickup!\n");
-#endif
+			#endif
 			return &(node -> order);
 		}
 	}
@@ -251,9 +251,9 @@ Order_t* om_contains_dropoff (Floor_t dropoff_floor) {
 	Order_list_node_t* node;
 	for (node = order_queue ; node != NULL ; node = node -> next) {
 		if (node -> order.dropoff_floor == dropoff_floor) {
-#ifdef _DEBUG_MESSAGES_
+			#ifdef _DEBUG_MESSAGES_
 			printf("Found order with dropoff!\n");
-#endif
+			#endif
 			return &(node -> order);
 		}
 	}
