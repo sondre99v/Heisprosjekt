@@ -78,9 +78,10 @@ void event_generator(void){
 		previous_floor = current_floor;
 
 		// Handle timer timeout
-		if (timer_is_timed_out() && !timer_timeout_last_value) {
+		bool timer_timeout_current_value = timer_is_timed_out();
+		if (timer_timeout_current_value && !timer_timeout_last_value) {
 			ec_event_raise(timer_timeout);
 		}
-		timer_timeout_last_value = timer_is_timed_out();
+		timer_timeout_last_value = timer_timeout_current_value;
 	}
 }
