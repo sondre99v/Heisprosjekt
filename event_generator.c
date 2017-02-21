@@ -51,7 +51,7 @@ void event_generator(void){
 		if (stop_button_current_state == true && stop_button_previous_state == false) {
 			ec_event_raise(pressed_stop);
 		}
-		stop_button_previous_state = hw_is_button_pressed(button_stop);
+		stop_button_previous_state = stop_button_current_state;
 		
 		
 		// Handle floors
