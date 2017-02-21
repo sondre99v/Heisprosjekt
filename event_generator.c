@@ -7,81 +7,87 @@
 #include "elevator_controller.h"
 #include "timer.h"
 
+
 // Array to iterate over the order-buttons. 
 // Stop is handeled separatly, because it needs an event on release as well.
-struct { Button_t button; bool previous_state; Event_t event_to_raise_on_press; } buttons [] = {
-	{.button = button_up_1st, .previous_state = false	, pressed_up_1st},
-	{.button = button_down_2nd, .previous_state = false	, pressed_down_2nd},
-	{.button = button_up_2nd, .previous_state = false	, pressed_up_2nd},
-	{.button = button_down_3rd, .previous_state = false	, pressed_down_3rd},
-	{.button = button_up_3rd, .previous_state = false, pressed_up_3rd},
-	{.button = button_down_4th, .previous_state = false	, pressed_down_4th},
-	{.button = button_floor_1st, .previous_state = false, pressed_elevator_1st},
-	{.button = button_floor_2nd, .previous_state = false, pressed_elevator_2nd},
-	{.button = button_floor_3rd, .previous_state = false, pressed_elevator_3rd},
-	{.button = button_floor_4th, .previous_state = false, pressed_elevator_4th}
+#define NUMBER_OF_BUTTONS 10
+struct { 
+	Button_t button; 
+	bool previous_state; 
+	Event_t event_to_raise_on_press; 
+} buttons [NUMBER_OF_BUTTONS] = {
+	{.button = button_floor_up_1st, 	.previous_state = false, event_pressed_up_1st},
+	{.button = button_floor_down_2nd,	.previous_state = false, event_pressed_down_2nd},
+	{.button = button_floor_up_2nd, 	.previous_state = false, event_pressed_up_2nd},
+	{.button = button_floor_down_3rd, 	.previous_state = false, event_pressed_down_3rd},
+	{.button = button_floor_up_3rd, 	.previous_state = false, event_pressed_up_3rd},
+	{.button = button_floor_down_4th, 	.previous_state = false, event_pressed_down_4th},
+	{.button = button_elevator_1st, 	.previous_state = false, event_pressed_elevator_1st},
+	{.button = button_elevator_2nd, 	.previous_state = false, event_pressed_elevator_2nd},
+	{.button = button_elevator_3rd, 	.previous_state = false, event_pressed_elevator_3rd},
+	{.button = button_elevator_4th, 	.previous_state = false, event_pressed_elevator_4th}
 };
 
-bool stop_button_previous_state = false;
+bool previous_stop_button_state = false;
+Floor_sensor_t previous_floor_sensor = floor_sensor_none;
+bool previous_timeout_state = true;
 
-Floor_sensor_t previous_floor = floor_sensor_none;
 
-bool timer_timeout_last_value = true;
-
-void event_generator(void){
+void event_generator( void ) {
 	// Raise startup event to initialize elevator
-	ec_event_raise(startup);
+	ec_raise_event(event_startup);
 
 	while (true) {
 		// Handle buttons other than the stop button
-		for (int index = 0; index < sizeof(buttons) / sizeof(buttons[0]) ; index++) {
+		for (int index = 0; index < NUMBER_OF_BUTTONS; index++) {
 			bool current_state = hw_is_button_pressed(buttons[index].button);
 			if (current_state && !buttons[index].previous_state) {
-				ec_event_raise(buttons[index].event_to_raise_on_press);
+				ec_raise_event(buttons[index].event_to_raise_on_press);
 			}
 			buttons[index].previous_state = current_state;
 		}
 		
 		
 		// Handle stop button
-		bool stop_button_current_state = hw_is_button_pressed(button_stop);
-		if (stop_button_current_state == false && stop_button_previous_state == true) {
-			ec_event_raise(released_stop);
+		bool current_stop_button_state = hw_is_button_pressed(button_stop);
+		if (current_stop_button_state == false && previous_stop_button_state == true) {
+			ec_raise_event(event_released_stop);
 		}
-		if (stop_button_current_state == true && stop_button_previous_state == false) {
-			ec_event_raise(pressed_stop);
+		if (current_stop_button_state == true && previous_stop_button_state == false) {
+			ec_raise_event(event_pressed_stop);
 		}
-		stop_button_previous_state = stop_button_current_state;
+		previous_stop_button_state = current_stop_button_state;
 		
 		
 		// Handle floors
-		Floor_sensor_t current_floor = hw_get_sensors_state();
-		if (current_floor != previous_floor) {
-			switch (current_floor) {
+		Floor_sensor_t current_floor_sensor = hw_get_sensors_state();
+		if (current_floor_sensor != previous_floor_sensor) {
+			switch (current_floor_sensor) {
 				case floor_sensor_1st: 
-					ec_event_raise(hit_1st);
+					ec_raise_event(event_hit_1st);
 					break;
 				case floor_sensor_2nd: 
-					ec_event_raise(hit_2nd);
+					ec_raise_event(event_hit_2nd);
 					break;
 				case floor_sensor_3rd: 
-					ec_event_raise(hit_3rd);
+					ec_raise_event(event_hit_3rd);
 					break;
 				case floor_sensor_4th: 
-					ec_event_raise(hit_4th);
+					ec_raise_event(event_hit_4th);
 					break;
 				default:
 					break;
 			}
 		}
 		
-		previous_floor = current_floor;
+		previous_floor_sensor = current_floor_sensor;
+
 
 		// Handle timer timeout
-		bool timer_timeout_current_value = timer_is_timed_out();
-		if (timer_timeout_current_value && !timer_timeout_last_value) {
-			ec_event_raise(timer_timeout);
+		bool current_timeout_state = timer_is_timed_out();
+		if (current_timeout_state && !previous_timeout_state) {
+			ec_raise_event(event_timer_timeout);
 		}
-		timer_timeout_last_value = timer_timeout_current_value;
+		previous_timeout_state = current_timeout_state;
 	}
 }

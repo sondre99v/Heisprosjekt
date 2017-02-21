@@ -27,14 +27,23 @@ typedef struct {
 	Floor_t dropoff_floor;
 } Order_t;
 
-void om_add_new_order (Floor_t pickup_floor, Direction_t direction);
-void om_add_new_dropoff_only_order (Floor_t dropoff_floor);
-void om_add_dropoff_to_order (Order_t* order, Floor_t dropoff_floor);
-void om_remove_order (Order_t* order);
-void om_remove_orders_with_dropoff (Floor_t dropoff_floor);
-void om_clear_all_orders (void);
-Order_t* om_get_first_order (void);
-Order_t* om_contains_pickup (Floor_t pickup_floor, Direction_t direction);
-Order_t* om_contains_dropoff (Floor_t dropoff_floor);
+
+void om_add_new_order(Floor_t pickup_floor, Direction_t direction);
+
+void om_add_new_dropoff_only_order(Floor_t dropoff_floor);
+
+void om_add_dropoff_to_order(Order_t* order, Floor_t dropoff_floor);
+
+void om_remove_order(Order_t* order);
+
+void om_remove_orders_with_dropoff(Floor_t dropoff_floor);
+
+void om_remove_all_orders( void );
+
+Order_t* om_get_first_order( void );
+
+Order_t* om_contains_pickup(Floor_t pickup_floor, Direction_t direction);
+
+Order_t* om_contains_dropoff(Floor_t dropoff_floor);
 
 #endif // #ifndef __ORDER_MANAGER_H__

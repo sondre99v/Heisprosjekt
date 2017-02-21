@@ -70,7 +70,8 @@ static Order_list_node_t* _find_node_with_order (Order_t* order) {
 static Order_list_node_t* _create_new_node (Floor_t pickup_floor, Direction_t direction, Floor_t dropoff_floor, Order_list_node_t* next) {
 	// Allocate memory for new order
 	Order_list_node_t* new_order_node = malloc(sizeof(Order_list_node_t));
-	
+	if (new_order_node == NULL) return NULL;
+
 	// Add values to the new node
 	new_order_node -> order.pickup_floor = pickup_floor;
 	new_order_node -> order.pickup_direction = direction;
@@ -168,7 +169,7 @@ void om_add_new_dropoff_only_order (Floor_t dropoff_floor) {
 }
 
 
-Order_t* om_get_first_order (void) {
+Order_t* om_get_first_order ( void ) {
 	if (order_queue == NULL) {
 		// Order queue is empty
 		return NULL;
@@ -221,7 +222,7 @@ void om_remove_orders_with_dropoff (Floor_t dropoff_floor) {
 }
 
 
-void om_clear_all_orders (void) {
+void om_remove_all_orders ( void ) {
 	while (order_queue != NULL) {
 		_remove_node(order_queue);
 	}
