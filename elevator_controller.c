@@ -154,7 +154,7 @@ static void _event_hit_floor(Floor_t hit_floor) {
 		order_at_this_floor = om_get_first_order();
 	}
 
-	if (order_at_this_floor != NULL && order_at_this_floor->pickup_floor == hit_floor) {
+	if (order_at_this_floor != NULL && order_at_this_floor->dropoff_floor == floor_unknown && order_at_this_floor->pickup_floor == hit_floor) {
 		printf("Stopped for pick-up\n");
 		_action_stop_moving();
 		_action_open_door();
