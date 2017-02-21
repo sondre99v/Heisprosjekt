@@ -72,7 +72,7 @@ static void _action_stop_moving() {
 }
 
 static void _action_go_towards(Floor_t destination_floor) {
-	printf("Moving towards floor %d from floor %d\n", (int)destination_floor, (int)elevator_state.last_floor);
+	printf("Moving towards floor %d from floor %d\n...\n", (int)destination_floor, (int)elevator_state.last_floor);
 
 	if (destination_floor > elevator_state.last_floor){
 		_action_move_up();
@@ -117,7 +117,7 @@ static void _event_handle_startup() {
 
 
 static void _event_hit_floor(Floor_t hit_floor) {
-	printf("Event hit floor\n");
+	printf("Event hit floor %d\n", (int)hit_floor);
 	_set_last_floor(hit_floor);
 
 	// If we hit a floor for the first time, stop and set initialization to finished
@@ -171,12 +171,22 @@ static void _event_handle_pressed_order_button(Floor_t order_floor, Direction_t 
 	if (elevator_state.fsm_state == searching_floor || elevator_state.fsm_state == emergency_stop) return;
 
 	printf("Event pressed %d\n", (int)order_floor);
-	om_add_new_order(order_floor, direction);
-	hw_set_led_state(_get_led_for_order_button(order_floor, direction), true);
 
-	if (elevator_state.fsm_state == idle) {
-		_action_go_towards(order_floor);
-		elevator_state.fsm_state = moving_to_floor;
+	if (elevator_state.fsm_state == moving_to_floor || (elevator_state.fsm_state == idle && elevator_state.last_floor != order_floor)) {
+		// We are moving, or stationary at the wrong floor
+		om_add_new_order(order_floor, direction);
+		hw_set_led_state(_get_led_for_order_button(order_floor, direction), true);
+
+		if (elevator_state.fsm_state == idle) {
+			_action_go_towards(order_floor);
+			elevator_state.fsm_state = moving_to_floor;
+		}
+	} else if (elevator_state.fsm_state == idle && elevator_state.last_floor == order_floor) {
+		// We are stationary (with door closed) at the correct floor
+		om_add_new_order(order_floor, direction);
+		elevator_state.order_to_finalize = om_contains_pickup(order_floor, direction);
+		_action_open_door();
+		elevator_state.fsm_state = door_open;
 	}
 }
 
@@ -186,22 +196,33 @@ static void _event_handle_pressed_elevator_button(Floor_t button_floor) {
 
 	printf("Event pressed elevator %d\n", (int)button_floor);
 
-	if (elevator_state.fsm_state == idle && elevator_state.last_floor == button_floor) {
-		_action_open_door();
-		elevator_state.fsm_state = door_open;
+	if (elevator_state.fsm_state == moving_to_floor) {
+		// Moving, add dropoff to queue
+		om_add_new_dropoff_only_order(button_floor);
+		hw_set_led_state(_get_led_for_dropoff_button(button_floor), true);
 	} else {
-		if (elevator_state.order_to_finalize != NULL) {
-			om_add_dropoff_to_order(elevator_state.order_to_finalize, button_floor);
-		} else {
+		// Not moving, either open door, add dropoff to existing order, or add new dropoff
+		if (elevator_state.last_floor == button_floor) {
+			// Button for this floor pressed, open door if not already open
 			if (elevator_state.fsm_state != door_open) {
+				_action_open_door();
+				elevator_state.fsm_state = door_open;
+			}
+		} else {
+			// Button for other floor pressed, add dropoff to existing or new order
+			if (elevator_state.order_to_finalize != NULL) {
+				// Expecting a dropoff entry, put it in the order
+				om_add_dropoff_to_order(elevator_state.order_to_finalize, button_floor);
+			} else {
+				// Not expecting a dropoff entry, add new dropoff-only order
 				om_add_new_dropoff_only_order(button_floor);
 			}
-		}
-		hw_set_led_state(_get_led_for_dropoff_button(button_floor), true);
+			hw_set_led_state(_get_led_for_dropoff_button(button_floor), true);
 
-		if (elevator_state.fsm_state == idle) {
-			_action_go_towards(button_floor);
-			elevator_state.fsm_state = moving_to_floor;
+			if (elevator_state.fsm_state == idle) {
+				_action_go_towards(button_floor);
+				elevator_state.fsm_state = moving_to_floor;
+			}
 		}
 	}
 }
