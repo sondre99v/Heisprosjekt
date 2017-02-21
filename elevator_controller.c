@@ -172,7 +172,7 @@ static void _event_handle_pressed_order_button(Floor_t order_floor, Direction_t 
 
 	printf("Event pressed %d\n", (int)order_floor);
 
-	if (elevator_state.fsm_state == moving_to_floor || (elevator_state.fsm_state == idle && elevator_state.last_floor != order_floor)) {
+	if (elevator_state.fsm_state == moving_to_floor || elevator_state.last_floor != order_floor) {
 		// We are moving, or stationary at the wrong floor
 		om_add_new_order(order_floor, direction);
 		hw_set_led_state(_get_led_for_order_button(order_floor, direction), true);
