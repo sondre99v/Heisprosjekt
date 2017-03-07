@@ -6,7 +6,7 @@
 #define MOTOR_SPEED         2800
 
 
-void hw_init() {
+void hw_init( void ) {
     io_init();
 
     hw_clear_all_leds();
@@ -35,17 +35,17 @@ void hw_set_motor_state(Motor_state_t state) {
 void hw_set_button_led_state(Button_t button, Led_state_t state) {
     short unsigned int address = 0;
     switch (button) {
-        case button_floor_up_1st:   address = LIGHT_UP1;  break;
-        case button_floor_down_2nd: address = LIGHT_DOWN2;  break;
-        case button_floor_up_2nd:   address = LIGHT_UP2;  break;
-        case button_floor_down_3rd: address = LIGHT_DOWN3;  break;
-        case button_floor_up_3rd:   address = LIGHT_UP3;  break;
-        case button_floor_down_4th: address = LIGHT_DOWN4;  break;
-        case button_elevator_1st:   address = LIGHT_COMMAND1; break;
-        case button_elevator_2nd:   address = LIGHT_COMMAND2; break;
-        case button_elevator_3rd:   address = LIGHT_COMMAND3; break;
-        case button_elevator_4th:   address = LIGHT_COMMAND4; break;
-        case button_stop:           address = LIGHT_STOP; break;
+        case button_floor_up_1st:   address = LIGHT_UP1;		break;
+        case button_floor_down_2nd: address = LIGHT_DOWN2;  	break;
+        case button_floor_up_2nd:   address = LIGHT_UP2;		break;
+        case button_floor_down_3rd: address = LIGHT_DOWN3;  	break;
+        case button_floor_up_3rd:   address = LIGHT_UP3;		break;
+        case button_floor_down_4th: address = LIGHT_DOWN4;		break;
+        case button_elevator_1st:   address = LIGHT_COMMAND1;	break;
+        case button_elevator_2nd:   address = LIGHT_COMMAND2;	break;
+        case button_elevator_3rd:   address = LIGHT_COMMAND3;	break;
+        case button_elevator_4th:   address = LIGHT_COMMAND4;	break;
+        case button_stop:           address = LIGHT_STOP;		break;
     }
 
     if (state == led_on) {

@@ -58,7 +58,7 @@ typedef enum {
 
 
 //Initializes the hardware and sets all LED's and motor to off
-void hw_init();
+void hw_init( void );
 
 void hw_set_motor_state(Motor_state_t state);
 

@@ -34,7 +34,6 @@ bool previous_timeout_state = true;
 
 
 void event_generator( void ) {
-	// Raise startup event to initialize elevator
 	ec_raise_event(event_startup);
 
 	while (true) {

@@ -157,10 +157,8 @@ void om_add_new_dropoff_only_order (Floor_t dropoff_floor) {
 		return;
 	}
 
-	// Create new node with given values
+	// Create new order and place it in the back of the queue.
 	Order_list_node_t* new_order_node = _create_new_node(floor_unknown, direction_none, dropoff_floor, order_queue);
-	
-	// Set the new node as the first in the queue
 	order_queue = new_order_node;
 	
 	#ifdef _DEBUG_MESSAGES_
@@ -173,13 +171,14 @@ Order_t* om_get_first_order ( void ) {
 	if (order_queue == NULL) {
 		// Order queue is empty
 		return NULL;
-	} else {
-		Order_list_node_t* node = order_queue;
-		while (node -> next != NULL) {
-			node = node -> next;
-		}
-		return &(node -> order);
 	}
+	
+	// First order in queue is the last node in the list.
+	Order_list_node_t* node = order_queue;
+	while (node -> next != NULL) {
+		node = node -> next;
+	}
+	return &(node -> order);
 }
 
 
@@ -233,7 +232,7 @@ void om_remove_all_orders ( void ) {
 }
 
 
-Order_t* om_contains_pickup (Floor_t pickup_floor, Direction_t direction) {
+Order_t* om_get_order_with_pickup (Floor_t pickup_floor, Direction_t direction) {
 	Order_list_node_t* node;
 	for (node = order_queue ; node != NULL ; node = node -> next) {
 		if (node -> order.pickup_floor == pickup_floor && node -> order.pickup_direction == direction) {
@@ -248,7 +247,7 @@ Order_t* om_contains_pickup (Floor_t pickup_floor, Direction_t direction) {
 }
 
 
-Order_t* om_contains_dropoff (Floor_t dropoff_floor) {
+Order_t* om_get_order_with_dropoff (Floor_t dropoff_floor) {
 	Order_list_node_t* node;
 	for (node = order_queue ; node != NULL ; node = node -> next) {
 		if (node -> order.dropoff_floor == dropoff_floor) {

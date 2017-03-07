@@ -5,7 +5,6 @@
 #include "timer.h"
 #include "order_manager.h"
 
-#include <assert.h>
 #include <stdio.h>
 
 
@@ -25,7 +24,7 @@ typedef enum {
 	fsm_state_idle,
 	fsm_state_moving_to_floor,
 	fsm_state_door_open,
-	 fsm_state_emergency_stop
+	fsm_state_emergency_stop
 } Fsm_state_t;
 
 
@@ -60,7 +59,7 @@ static Button_t _get_elevator_button_for_floor(Floor_t button_floor) {
 static Direction_t _direction_to_floor(Floor_t test_floor) {
 	switch (test_floor) {
 		case floor_1st: 
-			if (elevator_state.position < POSITION_AT_1ST) return direction_up;
+			if (elevator_state.position < POSITION_AT_1ST) return direction_up;		// Should not happen
 			if (elevator_state.position == POSITION_AT_1ST) return direction_none;
 			if (elevator_state.position > POSITION_AT_1ST) return direction_down;
 		case floor_2nd:
@@ -74,7 +73,7 @@ static Direction_t _direction_to_floor(Floor_t test_floor) {
 		case floor_4th:
 			if (elevator_state.position < POSITION_AT_4TH) return direction_up;
 			if (elevator_state.position == POSITION_AT_4TH) return direction_none;
-			if (elevator_state.position > POSITION_AT_4TH) return direction_down;
+			if (elevator_state.position > POSITION_AT_4TH) return direction_down;	// Should not happen
 		default: return direction_none;
 	}
 }
@@ -130,6 +129,8 @@ static void _action_go_towards(Floor_t destination_floor) {
 			if (_elevator_is_at_any_floor()) {
 				// Elevator is leaving floor, set position to between floors
 				elevator_state.position -= POSITION_HALF_FLOOR;
+				// Make sure we don't move under first floor.
+				assert(elevator_state.position >= POSITION_AT_1ST);
 			}
 			break;
 		case direction_up:
@@ -137,6 +138,8 @@ static void _action_go_towards(Floor_t destination_floor) {
 			if (_elevator_is_at_any_floor()) {
 				// Elevator is leaving floor, set position to between floors
 				elevator_state.position += POSITION_HALF_FLOOR;
+				// Make sure we don't move above forth floor.
+				assert(elevator_state.position <= POSITION_AT_4TH);
 			}
 			break;
 		case direction_none:
@@ -145,8 +148,6 @@ static void _action_go_towards(Floor_t destination_floor) {
 }
 
 static void _set_last_floor(Floor_t last_floor) {
-	assert (last_floor != floor_unknown);
-
 	switch (last_floor) {
 		case floor_1st:
 			elevator_state.position = POSITION_AT_1ST;
@@ -200,7 +201,7 @@ static void _event_hit_floor(Floor_t hit_floor) {
 	}
 
 	// Check if the current floor is the drop-off floor of any order
-	Order_t* order_at_this_floor = om_contains_dropoff(hit_floor);
+	Order_t* order_at_this_floor = om_get_order_with_dropoff(hit_floor);
 	if (order_at_this_floor != NULL) {
 		printf("Stopped for drop-off\n");
 		_action_stop_moving();
@@ -211,7 +212,7 @@ static void _event_hit_floor(Floor_t hit_floor) {
 	}
 
 	// Check if this floor is the pickup of any order with the same as the current direction
-	order_at_this_floor = om_contains_pickup(hit_floor, current_pickup_direction);
+	order_at_this_floor = om_get_order_with_pickup(hit_floor, current_pickup_direction);
 
 	if (order_at_this_floor == NULL) {
 		order_at_this_floor = om_get_first_order();
@@ -253,7 +254,7 @@ static void _event_handle_pressed_order_button(Floor_t order_floor, Direction_t 
 	} else if (elevator_state.fsm_state == fsm_state_idle && _elevator_is_at_floor(order_floor)) {
 		// We are stationary (with door closed) at the correct floor
 		om_add_new_order(order_floor, direction);
-		elevator_state.order_to_finalize = om_contains_pickup(order_floor, direction);
+		elevator_state.order_to_finalize = om_get_order_with_pickup(order_floor, direction);
 		_action_open_door();
 		elevator_state.fsm_state = fsm_state_door_open;
 	}
