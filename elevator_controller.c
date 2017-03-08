@@ -213,11 +213,14 @@ static void _event_hit_floor(Floor_t hit_floor) {
 	}
 
 	// Check if this floor is the pickup of any order with the same as the current direction
-	order_at_this_floor = om_get_order_with_pickup(hit_floor, current_pickup_direction);
-
-	if (order_at_this_floor == NULL) {
-		order_at_this_floor = om_get_first_order();
+	order_at_this_floor = om_get_first_order();
+	if (order_at_this_floor == NULL || order_at_this_floor->pickup_floor != hit_floor) {
+		order_at_this_floor = om_get_order_with_pickup(hit_floor, current_pickup_direction);
 	}
+	
+	/*if (order_at_this_floor == NULL) {
+		order_at_this_floor = om_get_first_order();
+	}*/
 
 	if (order_at_this_floor != NULL && order_at_this_floor->dropoff_floor == floor_unknown && order_at_this_floor->pickup_floor == hit_floor) {
 		printf("Stopped for pick-up\n");
@@ -345,12 +348,25 @@ static void _event_handle_timer_timeout() {
 
 	Order_t* next_order = om_get_first_order();
 	if (next_order != NULL) {
-		if (next_order->dropoff_floor != floor_unknown){
-			_action_go_towards(next_order -> dropoff_floor);
+		if (next_order -> dropoff_floor != floor_unknown) {
+			if (_elevator_is_at_floor(next_order -> dropoff_floor)) {
+				_action_open_door();
+				hw_set_button_led_state(_get_elevator_button_for_floor(next_order -> dropoff_floor), led_off);
+				om_remove_order(next_order);
+			} else {
+				_action_go_towards(next_order -> dropoff_floor);
+				elevator_state.fsm_state = fsm_state_moving_to_floor;
+			}
 		} else {
-			_action_go_towards(next_order -> pickup_floor);
+			if (_elevator_is_at_floor(next_order -> pickup_floor)) {
+				_action_open_door();
+				elevator_state.order_to_finalize = next_order;
+				hw_set_button_led_state(_get_floor_button_for_floor(next_order -> pickup_floor, next_order -> pickup_direction), led_off);
+			} else {
+				_action_go_towards(next_order -> pickup_floor);
+				elevator_state.fsm_state = fsm_state_moving_to_floor;
+			}
 		}
-		elevator_state.fsm_state = fsm_state_moving_to_floor;
 	} else {
 		elevator_state.fsm_state = fsm_state_idle;
 	}
