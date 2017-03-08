@@ -6,6 +6,7 @@
 #include "order_manager.h"
 
 #include <stdio.h>
+#include <assert.h>
 
 
 #define POSITION_UNKNOWN	-1.0

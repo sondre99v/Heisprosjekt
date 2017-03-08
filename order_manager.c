@@ -128,7 +128,7 @@ static void _remove_node(Order_list_node_t* node) {
 
 void om_add_new_order (Floor_t pickup_floor, Direction_t direction) {
 	// Check if queue contains this order already
-	Order_t* old_order = om_contains_pickup(pickup_floor, direction);
+	Order_t* old_order = om_get_order_with_pickup(pickup_floor, direction);
 	if (old_order != NULL && old_order -> dropoff_floor == floor_unknown) {
 		#ifdef _DEBUG_MESSAGES_
 		printf("Order already present.\n");
@@ -150,7 +150,7 @@ void om_add_new_order (Floor_t pickup_floor, Direction_t direction) {
 
 void om_add_new_dropoff_only_order (Floor_t dropoff_floor) {
 	// Check if queue contains this order already
-	if (om_contains_dropoff(dropoff_floor)) {
+	if (om_get_order_with_dropoff(dropoff_floor)) {
 		#ifdef _DEBUG_MESSAGES_
 		printf("Dropoff floor already present.\n");
 		#endif
