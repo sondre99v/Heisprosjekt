@@ -1,5 +1,3 @@
-//Author: Finn Matras & Sondre Ninive Andersen
-
 #ifndef __INCLUDE_HARDWARE_H__
 #define __INCLUDE_HARDWARE_H__
 

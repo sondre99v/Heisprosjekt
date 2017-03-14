@@ -1,5 +1,3 @@
-//Author: Finn Matras & Sondre Ninive Andersen
-
 #ifndef __TIMER_H__
 #define __TIMER_H__
 

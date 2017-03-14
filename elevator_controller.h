@@ -1,5 +1,3 @@
-//Author: Finn Matras & Sondre Ninive Andersen
-
 #ifndef __ELEVATOR_CONTROLLER_H__
 #define __ELEVATOR_CONTROLLER_H__
 

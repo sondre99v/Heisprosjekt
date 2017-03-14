@@ -1,5 +1,3 @@
-//Author: Finn Matras & Sondre Ninive Andersen
-
 #include "hardware.h"
 #include "timer.h"
 #include "event_generator.h"

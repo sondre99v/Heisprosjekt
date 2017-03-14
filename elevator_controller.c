@@ -1,5 +1,3 @@
-//Author: Finn Matras & Sondre Ninive Andersen
-
 #include "elevator_controller.h"
 #include "hardware.h"
 #include "timer.h"
